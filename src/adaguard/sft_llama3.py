@@ -28,12 +28,11 @@ class TrainingConfig:
     wandb_entity: Optional[str] = field(default=None)
 
     # this is our new HF dataset from the build script
-    train_file_path: Optional[str] = field(default="matthewho/wildjailbreak-s1k-llama3")
+    train_file_path: Optional[str] = field(default="msho/wildjailbreak-s1k-llama3")
 
     # not using dagger here, keep it for compatibility
     dagger: bool = field(default=False)
 
-    push_to_hub: bool = field(default=True)
     hf_access_token_var: str = field(default="HF_ACCESS_TOKEN")
 
     def __post_init__(self):
