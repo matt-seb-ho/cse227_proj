@@ -8,6 +8,9 @@ from typing import Optional
 import transformers
 import trl
 from datasets import load_dataset
+from dotenv import load_dotenv
+
+from .constants import ENV_FILE
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
@@ -29,6 +32,9 @@ class TrainingConfig:
 
     # not using dagger here, keep it for compatibility
     dagger: bool = field(default=False)
+
+    push_to_hub: bool = field(default=True)
+    hf_access_token_var: str = field(default="HF_ACCESS_TOKEN")
 
     def __post_init__(self):
         if self.wandb_project is not None:
@@ -102,6 +108,13 @@ def train():
     trainer.save_model(output_dir=args.output_dir)
     tokenizer.save_pretrained(args.output_dir)
     trainer.accelerator.wait_for_everyone()
+
+    # push model to hub
+    if config.push_to_hub:
+        # get token
+        load_dotenv(ENV_FILE)
+        hf_token = os.getenv(config.hf_access_token_var)
+        trainer.push_to_hub(token=hf_token)
 
 
 if __name__ == "__main__":

@@ -1,6 +1,5 @@
 abnf==2.2.0
 accelerate==1.12.0
--e file:///Users/matthewho/Documents/uni/ucsd/cse227_security/cse227_proj
 aiohappyeyeballs==2.6.1
 aiohttp==3.13.2
 aiosignal==1.4.0
@@ -100,7 +99,6 @@ parso==0.8.5
 pdfminer-six==20250506
 pexpect==4.9.0
 pillow==12.0.0
-pip @ file:///home/task_176313218821961/conda-bld/pip_1763132220821/work
 platformdirs==4.5.0
 polyfile-weave==0.5.7
 prometheus-client==0.23.1
