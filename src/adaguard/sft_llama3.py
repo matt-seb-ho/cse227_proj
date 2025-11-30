@@ -9,6 +9,8 @@ import transformers
 import trl
 from datasets import load_dataset
 from dotenv import load_dotenv
+from peft import LoraConfig
+
 
 from .constants import ENV_FILE
 
@@ -99,6 +101,27 @@ def train():
     #   and will apply the chat template for conversational data.
 
     # -----------------------
+    # 4. LoRA config
+    # -----------------------
+    # You can shrink r to 16 if you want even lighter memory usage.
+    peft_config = LoraConfig(
+        r=32,
+        lora_alpha=16,
+        lora_dropout=0.05,
+        bias="none",
+        task_type="CAUSAL_LM",
+        target_modules=[
+            "q_proj",
+            "k_proj",
+            "v_proj",
+            "o_proj",
+            "gate_proj",
+            "up_proj",
+            "down_proj",
+        ],
+    )
+
+    # -----------------------
     # 4. SFTTrainer
     # -----------------------
     trainer = trl.SFTTrainer(
@@ -106,6 +129,7 @@ def train():
         train_dataset=train_ds,
         eval_dataset=eval_ds,
         args=args,
+        peft_config=peft_config,
         # no custom collator: SFTTrainer will use DataCollatorForLanguageModeling
         # and set completion_only_loss based on the dataset format.
     )
