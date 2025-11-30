@@ -73,7 +73,7 @@ def train():
     dataset = load_dataset(config.train_file_path)
 
     train_ds = dataset["train"]
-    eval_ds = dataset["test"] if "test" in dataset else None
+    eval_ds = dataset["test"] if "test" in dataset else train_ds
 
     # -----------------------
     # 3. Tokenizer setup
@@ -85,11 +85,13 @@ def train():
     )
 
     # Llama-3 chat models typically don't have pad_token set; set to eos for training
-    if tokenizer.pad_token is None:
-        tokenizer.pad_token = tokenizer.eos_token
+    # NOTE: not necessary: https://huggingface.co/docs/trl/en/sft_trainer#trl.SFTConfig
+    # if tokenizer.pad_token is None:
+    #     tokenizer.pad_token = tokenizer.eos_token
 
     # use our desired max seq length
-    args.max_seq_length = config.block_size
+    # args.max_seq_length = config.block_size
+    args.max_length = config.block_size
 
     # We are using a prompt–completion dataset, so:
     # - we do NOT set args.dataset_text_field
@@ -101,7 +103,6 @@ def train():
     # -----------------------
     trainer = trl.SFTTrainer(
         model=model,
-        tokenizer=tokenizer,
         train_dataset=train_ds,
         eval_dataset=eval_ds,
         args=args,
