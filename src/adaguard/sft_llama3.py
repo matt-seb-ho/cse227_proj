@@ -53,6 +53,7 @@ def train():
     # get token
     load_dotenv(ENV_FILE)
     hf_token = os.getenv(config.hf_access_token_var)
+    args.hub_token = hf_token
 
     # -----------------------
     # 1. Load model
@@ -119,7 +120,7 @@ def train():
     trainer.accelerator.wait_for_everyone()
 
     # push model to hub
-    if config.push_to_hub:
+    if args.push_to_hub:
         trainer.push_to_hub(token=hf_token)
 
 
