@@ -50,6 +50,10 @@ def train():
     log_config = {**asdict(config), **asdict(args)}
     logging.info(f"Training config: {log_config}")
 
+    # get token
+    load_dotenv(ENV_FILE)
+    hf_token = os.getenv(config.hf_access_token_var)
+
     # -----------------------
     # 1. Load model
     # -----------------------
@@ -58,6 +62,7 @@ def train():
     model = transformers.AutoModelForCausalLM.from_pretrained(
         config.model_name,
         torch_dtype="auto",
+        token=hf_token,
     )
 
     # -----------------------
@@ -76,6 +81,7 @@ def train():
     tokenizer = transformers.AutoTokenizer.from_pretrained(
         config.model_name,
         use_fast=True,
+        token=hf_token,
     )
 
     # Llama-3 chat models typically don't have pad_token set; set to eos for training
@@ -110,9 +116,6 @@ def train():
 
     # push model to hub
     if config.push_to_hub:
-        # get token
-        load_dotenv(ENV_FILE)
-        hf_token = os.getenv(config.hf_access_token_var)
         trainer.push_to_hub(token=hf_token)
 
 
