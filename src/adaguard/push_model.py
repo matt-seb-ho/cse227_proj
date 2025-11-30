@@ -9,13 +9,11 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--output_dir",
-        required=True,
         help="Local dir with saved model/adapter",
         default="ckpts/s1_wildjb_",
     )
     parser.add_argument(
         "--repo_id",
-        required=True,
         help="HF repo id: username/name or org/name",
         default="msho/s1_wjb_llama3_peft",
     )
