@@ -54,12 +54,6 @@ def parse_args():
         default=48,
         help="Max tokens for regenerated final answer phase.",
     )
-    p.add_argument(
-        "--system-message",
-        type=str,
-        default=None,
-        help="System message used in original runs (if any). Default: None.",
-    )
     return p.parse_args()
 
 
@@ -132,7 +126,6 @@ def compute_metrics(labels, preds):
 def regenerate_answer_for_example(
     client: OpenAI,
     model_name: str,
-    system_message,
     record: dict,
     final_answer_tokens: int,
 ):
@@ -146,9 +139,8 @@ def regenerate_answer_for_example(
     user_prompt = format_prompt_for_classification(adversarial)
 
     # Reconstruct conversation:
-    # system -> user -> assistant(thinking_trace)
+    # user -> assistant(thinking_trace)
     conversation = [
-        {"role": "system", "content": system_message},
         {"role": "user", "content": user_prompt},
         {"role": "assistant", "content": thinking_trace},
     ]
@@ -227,7 +219,6 @@ def main():
                     record = regenerate_answer_for_example(
                         client=client,
                         model_name=args.model_name,
-                        system_message=args.system_message,
                         record=record,
                         final_answer_tokens=args.final_answer_tokens,
                     )
