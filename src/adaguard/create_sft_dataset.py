@@ -57,6 +57,13 @@ def build_prompt_completion_row(example: Dict) -> Dict:
         "</content_to_classify>"
     )
 
+    prompt = [
+        {
+            "role": "user",
+            "content": user_text,
+        }
+    ]
+
     # ---- ASSISTANT MESSAGE ----
     if reasoning:
         assistant_text = f"<think>\n{reasoning}\n</think>{label}"
@@ -64,9 +71,16 @@ def build_prompt_completion_row(example: Dict) -> Dict:
         # still keep <think></think> so the format is consistent
         assistant_text = f"<think></think>{label}"
 
+    completion = [
+        {
+            "role": "assistant",
+            "content": assistant_text,
+        }
+    ]
+
     return {
-        "prompt": user_text,
-        "completion": assistant_text,
+        "prompt": prompt,
+        "completion": completion,
         "label": label,
         "data_type": example["data_type"],
     }
