@@ -173,7 +173,7 @@ class RemoteBudgetForcer:
             messages=conversation,
             max_tokens=cfg.final_answer_tokens,
             stop=None,
-            min_tokens=0,
+            min_tokens=1,
             want_logprobs=True,
             top_logprobs=0,  # just need chosen-token logprobs
         )
