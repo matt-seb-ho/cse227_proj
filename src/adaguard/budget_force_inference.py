@@ -145,18 +145,18 @@ class RemoteBudgetForcer:
         total_thinking_tokens += tokens
         remaining_budget -= tokens
 
-        assert full_text.startswith(assistant_prefix), (
-            "Server returned assistant content that does not start with the "
-            "local assistant_prefix; check continue_final_message handling."
-        )
-        chunk = full_text[len(assistant_prefix) :]
+        # assert full_text.startswith(assistant_prefix), (
+        #     "Server returned assistant content that does not start with the "
+        #     "local assistant_prefix; check continue_final_message handling."
+        # )
+        # chunk = full_text[len(assistant_prefix) :]
 
         # ----- Repeated "ignore" passes -----
         for _ in range(cfg.num_ignore):
             if remaining_budget <= 0:
                 break
 
-            conversation[-1]["content"] += chunk + cfg.ignore_str
+            conversation[-1]["content"] += full_text + cfg.ignore_str
 
             assistant_prefix = conversation[-1]["content"]
             full_text, tokens, _ = self._chat_once(
@@ -169,14 +169,14 @@ class RemoteBudgetForcer:
             total_thinking_tokens += tokens
             remaining_budget -= tokens
 
-            assert full_text.startswith(assistant_prefix), (
-                "Server returned assistant content that does not start with the "
-                "local assistant_prefix; check continue_final_message handling."
-            )
-            chunk = full_text[len(assistant_prefix) :]
+            # assert full_text.startswith(assistant_prefix), (
+            #     "Server returned assistant content that does not start with the "
+            #     "local assistant_prefix; check continue_final_message handling."
+            # )
+            # chunk = full_text[len(assistant_prefix) :]
 
         # After the loop, append the last thinking chunk without ignore_str
-        conversation[-1]["content"] += chunk
+        conversation[-1]["content"] += full_text
 
         # Close the think tag
         conversation[-1]["content"] += cfg.stop_str
@@ -195,12 +195,12 @@ class RemoteBudgetForcer:
         )
 
         # Ensure the prefix matches, then recover just the newly generated answer text
-        assert full_text_answer.startswith(assistant_prefix), (
-            "Server returned assistant content that does not start with the "
-            "local assistant_prefix; check continue_final_message handling."
-        )
-        answer_chunk = full_text_answer[len(assistant_prefix) :]
-        conversation[-1]["content"] = full_text_answer
+        # assert full_text_answer.startswith(assistant_prefix), (
+        #     "Server returned assistant content that does not start with the "
+        #     "local assistant_prefix; check continue_final_message handling."
+        # )
+        # answer_chunk = full_text_answer[len(assistant_prefix) :]
+        conversation[-1]["content"] += full_text_answer
 
         # Parse tokens/logprobs (vLLM completion-style schema)
         answer_tokens_list: Optional[List[str]] = None
@@ -217,7 +217,7 @@ class RemoteBudgetForcer:
         return BudgetForcingResult(
             conversation=conversation,
             thinking_trace=thinking_trace,
-            final_answer_text=answer_chunk,
+            final_answer_text=full_text_answer,
             total_thinking_tokens=total_thinking_tokens,
             total_answer_tokens=answer_tokens,
             answer_tokens=answer_tokens_list,

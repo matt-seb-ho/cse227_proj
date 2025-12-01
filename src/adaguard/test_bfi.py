@@ -25,7 +25,7 @@ def main():
     )
     budget_forcer = RemoteBudgetForcer(
         client=client,
-        model_name="ckpts/s1_wildjb_20251201_024122",
+        model_name="ckpts/s1_wildjb_20251201_024122/merged",
         config=config,
     )
 
