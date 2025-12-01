@@ -32,6 +32,16 @@ CLASSIFIER_INSTRUCTIONS = (
 )
 
 
+def format_prompt_for_classification(user_request: str) -> str:
+    """Format the full prompt text for a single user request."""
+    return (
+        f"{CLASSIFIER_INSTRUCTIONS}\n\n"
+        "<content_to_classify>\n"
+        f"{user_request}\n"
+        "</content_to_classify>"
+    )
+
+
 def build_prompt_completion_row(example: Dict) -> Dict:
     """Convert one WildJailbreak row into prompt–completion format for
     CoT-enabled safety classification SFT.
