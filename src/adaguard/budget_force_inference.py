@@ -134,7 +134,6 @@ class RemoteBudgetForcer:
         total_thinking_tokens = 0
 
         # ----- First thinking pass -----
-        assistant_prefix = conversation[-1]["content"]
         full_text, tokens, _ = self._chat_once(
             messages=conversation,
             max_tokens=remaining_budget,
@@ -145,12 +144,6 @@ class RemoteBudgetForcer:
         total_thinking_tokens += tokens
         remaining_budget -= tokens
 
-        # assert full_text.startswith(assistant_prefix), (
-        #     "Server returned assistant content that does not start with the "
-        #     "local assistant_prefix; check continue_final_message handling."
-        # )
-        # chunk = full_text[len(assistant_prefix) :]
-
         # ----- Repeated "ignore" passes -----
         for _ in range(cfg.num_ignore):
             if remaining_budget <= 0:
@@ -158,7 +151,6 @@ class RemoteBudgetForcer:
 
             conversation[-1]["content"] += full_text + cfg.ignore_str
 
-            assistant_prefix = conversation[-1]["content"]
             full_text, tokens, _ = self._chat_once(
                 messages=conversation,
                 max_tokens=remaining_budget,
@@ -169,12 +161,6 @@ class RemoteBudgetForcer:
             total_thinking_tokens += tokens
             remaining_budget -= tokens
 
-            # assert full_text.startswith(assistant_prefix), (
-            #     "Server returned assistant content that does not start with the "
-            #     "local assistant_prefix; check continue_final_message handling."
-            # )
-            # chunk = full_text[len(assistant_prefix) :]
-
         # After the loop, append the last thinking chunk without ignore_str
         conversation[-1]["content"] += full_text
 
@@ -183,8 +169,6 @@ class RemoteBudgetForcer:
         thinking_trace = conversation[-1]["content"]
 
         # ----- Final answer phase (with logprobs) -----
-        assistant_prefix = conversation[-1]["content"]
-
         full_text_answer, answer_tokens, logprobs_obj = self._chat_once(
             messages=conversation,
             max_tokens=cfg.final_answer_tokens,
@@ -194,19 +178,13 @@ class RemoteBudgetForcer:
             top_logprobs=0,  # just need chosen-token logprobs
         )
 
-        # Ensure the prefix matches, then recover just the newly generated answer text
-        # assert full_text_answer.startswith(assistant_prefix), (
-        #     "Server returned assistant content that does not start with the "
-        #     "local assistant_prefix; check continue_final_message handling."
-        # )
-        # answer_chunk = full_text_answer[len(assistant_prefix) :]
         conversation[-1]["content"] += full_text_answer
 
         # Parse tokens/logprobs (vLLM completion-style schema)
         answer_tokens_list: Optional[List[str]] = None
         answer_token_logprobs: Optional[List[float]] = None
         if logprobs_obj is not None:
-            # These names follow vLLM's current schema for logprobs in chat.  [oai_citation:2‡GitHub](https://github.com/vllm-project/vllm/issues/3179?utm_source=chatgpt.com)
+            # These names follow vLLM's current schema for logprobs in chat.
             tokens_field = getattr(logprobs_obj, "tokens", None)
             token_lp_field = getattr(logprobs_obj, "token_logprobs", None)
 
