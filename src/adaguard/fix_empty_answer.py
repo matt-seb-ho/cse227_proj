@@ -145,8 +145,6 @@ def regenerate_answer_for_example(
         {"role": "assistant", "content": thinking_trace},
     ]
 
-    assistant_prefix = conversation[-1]["content"]
-
     completion = client.chat.completions.create(
         model=model_name,
         messages=conversation,
@@ -164,16 +162,8 @@ def regenerate_answer_for_example(
     full_text = choice.message.content or ""
     completion_tokens = completion.usage.completion_tokens or 0
 
-    if not full_text.startswith(assistant_prefix):
-        raise RuntimeError(
-            "Server returned assistant content that does not start with the "
-            "local assistant_prefix; check continue_final_message handling."
-        )
-
-    answer_chunk = full_text[len(assistant_prefix) :]
-
     # Update record fields
-    record["final_answer_text"] = answer_chunk
+    record["final_answer_text"] = full_text
     record["total_answer_tokens"] = completion_tokens
 
     return record
