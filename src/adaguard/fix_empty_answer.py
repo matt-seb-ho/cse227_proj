@@ -45,7 +45,7 @@ def parse_args():
     p.add_argument(
         "--model-name",
         type=str,
-        required=True,
+        default="ckpts/s1_wildjb_20251201_024122/merged",
         help="Model name passed to the vLLM server (must match --model/--served-model-name).",
     )
     p.add_argument(
