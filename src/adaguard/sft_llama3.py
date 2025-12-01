@@ -123,6 +123,44 @@ def train():
     if args.push_to_hub:
         trainer.push_to_hub(token=hf_token)
 
+    # -----------------------
+    # 5. Merge LoRA and save full model for vLLM
+    # -----------------------
+    # This creates a non-PEFT, fully merged HF checkpoint in
+    #   {args.output_dir}/merged
+    # that you can load directly with vLLM.
+    try:
+        logging.info("Merging LoRA adapter into base model for vLLM...")
+
+        # unwrap from Accelerate so we get the raw PeftModel
+        peft_model = trainer.model
+        if hasattr(trainer, "accelerator"):
+            peft_model = trainer.accelerator.unwrap_model(peft_model)
+
+        # merge_and_unload turns the PeftModel into a plain AutoModelForCausalLM
+        merged_model = peft_model.merge_and_unload()
+
+        merged_output_dir = os.path.join(args.output_dir, "merged")
+        os.makedirs(merged_output_dir, exist_ok=True)
+
+        # save merged model + tokenizer as a normal HF checkpoint
+        merged_model.save_pretrained(merged_output_dir)
+        # SFTTrainer always has a tokenizer
+        trainer.tokenizer.save_pretrained(merged_output_dir)
+
+        logging.info(f"Merged full model (no LoRA) saved to: {merged_output_dir}")
+    except Exception as e:
+        logging.exception(f"Failed to merge and save LoRA model: {e}")
+
+    # loading merged
+    # from vllm import LLM
+    # model_path = "ckpts/s1_wildjb_20251130_123456/merged"
+    # llm = LLM(
+    #     model=model_path,
+    #     tokenizer=model_path,
+    #     trust_remote_code=True,   # needed for Meta Llama 3.x
+    # )
+
 
 if __name__ == "__main__":
     train()
