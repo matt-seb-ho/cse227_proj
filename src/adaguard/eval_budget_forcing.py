@@ -189,6 +189,8 @@ def main():
     labels = []
     preds = []
 
+    full_run_think_token_total = 0
+
     with results_path.open("w", encoding="utf-8") as f_out:
         for idx in tqdm(range(n_eval)):
             ex = dataset[idx]
@@ -217,6 +219,7 @@ def main():
                 pred_label = extract_pred_label(final_answer_text)
 
             preds.append(pred_label)
+            full_run_think_token_total += total_thinking_tokens
 
             # Serialize per-example result to JSONL
             record = {
@@ -248,6 +251,8 @@ def main():
     print("Metrics:")
     for k, v in metrics.items():
         print(f"  {k}: {v}")
+
+    print(f"Average Thinking Tokens: {full_run_think_token_total / n_eval}")
 
 
 if __name__ == "__main__":
