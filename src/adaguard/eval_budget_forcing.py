@@ -72,6 +72,12 @@ def parse_args():
         default=None,
         help="Optional cap on number of examples to run (for debugging).",
     )
+    parser.add_argument(
+        "--continue_string",
+        type=str,
+        default=" wait",
+        help="string to extend thinking",
+    )
     return parser.parse_args()
 
 
@@ -159,7 +165,8 @@ def main():
         max_tokens_thinking=args.max_tokens_thinking,
         num_ignore=args.num_ignore,
         final_answer_tokens=args.final_answer_tokens,
-        ignore_str=" wait",
+        # ignore_str=" wait",
+        ignore_str=args.continue_string,
         stop_str="</think>",
     )
 
