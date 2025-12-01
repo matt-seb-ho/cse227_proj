@@ -106,8 +106,9 @@ def budget_forced_generation(
 if __name__ == "__main__":
     dataset = load_dataset("msho/wjb_eval_subset100")["train"]
     prompt = dataset[0]["adversarial"]
+    print(prompt)
 
-    model = LLM("msho/s1_wjb_llama3_merged")
+    model = LLM("msho/s1_wjb_llama3_merged_fr")
 
     output = budget_forced_generation(
         prompt=prompt,
