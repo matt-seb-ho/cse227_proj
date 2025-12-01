@@ -13,6 +13,7 @@ def main():
     client = OpenAI(
         # base_url="http://127.0.0.1:8000/v1",  # where you served vLLM
         base_url="http://0.0.0.0:8000/v1",
+        api_key="NONE",
     )
     config = BudgetForcingConfig(
         system_message=None,
@@ -22,7 +23,7 @@ def main():
         ignore_str=" wait",
         stop_str="</think>",
     )
-    RemoteBudgetForcer(
+    budget_forcer = RemoteBudgetForcer(
         client=client,
         model_name="/root/cse227_proj/src/ckpts/s1_wildjb_20251201_024122",
         config=config,
@@ -34,7 +35,7 @@ def main():
     formatted_prompt = format_prompt_for_classification(test_prompt)
 
     # run budget forced inference
-    output = RemoteBudgetForcer.budget_forced_generation(
+    output = budget_forcer.budget_forced_generation(
         user_prompt=formatted_prompt,
     )
     print(output)
