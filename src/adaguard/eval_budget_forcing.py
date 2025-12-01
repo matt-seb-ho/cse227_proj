@@ -5,6 +5,7 @@ from pathlib import Path
 
 from datasets import load_dataset
 from openai import OpenAI
+from tqdm import tqdm
 
 from .budget_force_inference import (
     BudgetForcingConfig,
@@ -189,7 +190,7 @@ def main():
     preds = []
 
     with results_path.open("w", encoding="utf-8") as f_out:
-        for idx in range(n_eval):
+        for idx in tqdm(range(n_eval)):
             ex = dataset[idx]
             adversarial = ex["adversarial"]
             label = int(ex["label"])  # 0 = benign, 1 = harmful
