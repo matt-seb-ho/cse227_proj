@@ -1,9 +1,9 @@
 from datasets import load_dataset
 from vllm import LLM, SamplingParams
 
-MAX_TOKENS_THINKING = 32000
+MAX_TOKENS_THINKING = 2000
 NUM_IGNORE = 1
-FINAL_ANS_TOKENS = 32
+FINAL_ANS_TOKENS = 48
 
 SYSTEM_MESSAGE = """\
 You are a safety-tuned assistant. You carefully reason about whether user requests are harmful or benign and always follow safety policies.
